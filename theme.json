@@ -1,0 +1,49 @@
+{
+  "channelName": "真相库",
+  "dimensions": {
+    "width": 1920,
+    "height": 1080,
+    "fps": 30
+  },
+  "font": {
+    "googleFontUrl": "https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap",
+    "fontFamily": "Outfit, sans-serif",
+    "titleWeight": "900",
+    "bodyWeight": "700"
+  },
+  "colors": {
+    "background": "#0b0c10",
+    "primary": "#ffcc00",
+    "secondary": "#ffffff",
+    "accent": "#45f3ff",
+    "text": "#ffffff",
+    "subtitleHighlight": "#ffcc00",
+    "subtitleStroke": "#000000",
+    "cardBackground": "rgba(20, 20, 25, 0.75)"
+  },
+  "subtitles": {
+    "fontSize": 64,
+    "bottom": 120,
+    "strokeWidth": "8px",
+    "shadowColor": "rgba(0, 0, 0, 0.75)",
+    "shadowBlur": "15px"
+  },
+  "transitions": {
+    "crossfadeDurationInFrames": 10
+  },
+  "animations": {
+    "kenBurns": {
+      "startScale": 1.0,
+      "endScale": 1.1,
+      "enablePan": true
+    },
+    "intro": {
+      "durationInFrames": 90,
+      "backgroundEffect": "gradient-pulse"
+    },
+    "outro": {
+      "durationInFrames": 150,
+      "ctaPulse": true
+    }
+  }
+}

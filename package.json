@@ -1,0 +1,27 @@
+{
+  "name": "youtube-shorts-pipeline",
+  "version": "1.0.0",
+  "description": "Automated YouTube Shorts generation pipeline with Remotion and n8n",
+  "main": "bin/pipeline.js",
+  "scripts": {
+    "start": "remotion preview src/index.ts",
+    "build": "remotion bundle src/index.ts out/bundle.js",
+    "render": "node bin/pipeline.js"
+  },
+  "dependencies": {
+    "@remotion/bundler": "^4.0.190",
+    "@remotion/cli": "^4.0.190",
+    "@remotion/media-utils": "^4.0.190",
+    "@remotion/renderer": "^4.0.190",
+    "axios": "^1.7.2",
+    "csv-parser": "^3.0.0",
+    "dotenv": "^16.4.5",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "remotion": "^4.0.190"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.0",
+    "typescript": "^5.0.0"
+  }
+}

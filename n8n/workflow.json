@@ -1,0 +1,133 @@
+{
+  "name": "真相库短视频全自动渲染工作流",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "render-video",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "webhook-trigger",
+      "name": "Webhook 接收上传信号"
+    },
+    {
+      "parameters": {
+        "command": "node bin/pipeline.js --csv \"{{ $json.body.csv_path || 'F:/youtube-shorts-pipeline/test-data/storyboard.csv' }}\" --images \"{{ $json.body.images_dir || 'F:/youtube-shorts-pipeline/test-data/images' }}\" --output \"{{ $json.body.output_path || 'F:/youtube-shorts-pipeline/out/video.mp4' }}\" {{ $json.body.use_local_tts ? '--local-tts' : '' }}"
+      },
+      "type": "n8n-nodes-base.executeCommandLine",
+      "typeVersion": 1,
+      "position": [
+        250,
+        0
+      ],
+      "id": "run-pipeline",
+      "name": "执行 Remotion 渲染脚本",
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{ $json.exitCode }}",
+              "operation": "equal"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        500,
+        0
+      ],
+      "id": "check-success",
+      "name": "检查运行状态"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"status\": \"success\",\n  \"message\": \"视频自动剪辑任务已完成并成功导出成片。\",\n  \"details\": \"{{ $json.stdout }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        750,
+        -100
+      ],
+      "id": "response-success",
+      "name": "返回成功响应"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"status\": \"failed\",\n  \"message\": \"视频自动剪辑任务失败。\",\n  \"details\": \"{{ $json.stderr || $json.stdout }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        750,
+        150
+      ],
+      "id": "response-failed",
+      "name": "返回失败响应"
+    }
+  ],
+  "connections": {
+    "webhook-trigger": {
+      "main": [
+        [
+          {
+            "node": "run-pipeline",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "run-pipeline": {
+      "main": [
+        [
+          {
+            "node": "check-success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "check-success": {
+      "main": [
+        [
+          {
+            "node": "response-success",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "response-failed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionTimeout": 600
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "active": false
+}
