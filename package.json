@@ -2,11 +2,16 @@
   "name": "youtube-shorts-pipeline",
   "version": "1.0.0",
   "description": "Automated YouTube Shorts generation pipeline with Remotion and n8n",
-  "main": "bin/pipeline.js",
+  "main": "desktop/main.js",
   "scripts": {
     "start": "remotion preview src/index.ts",
     "build": "remotion bundle src/index.ts out/bundle.js",
-    "render": "node bin/pipeline.js"
+    "render": "node bin/pipeline.js",
+    "client:install": "npm --prefix client install",
+    "client:dev": "npm --prefix client run dev",
+    "client:build": "npm --prefix client run build",
+    "desktop:dev": "electron desktop/main.js",
+    "desktop:build": "npm run client:build && electron-builder"
   },
   "dependencies": {
     "@remotion/bundler": "^4.0.190",
@@ -14,14 +19,41 @@
     "@remotion/media-utils": "^4.0.190",
     "@remotion/renderer": "^4.0.190",
     "axios": "^1.7.2",
+    "cors": "^2.8.5",
     "csv-parser": "^3.0.0",
     "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "multer": "^1.4.5-lts.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "remotion": "^4.0.190"
   },
   "devDependencies": {
     "@types/react": "^18.2.0",
+    "electron": "^31.0.1",
+    "electron-builder": "^24.13.3",
     "typescript": "^5.0.0"
+  },
+  "build": {
+    "appId": "com.youtube.shorts.pipeline",
+    "productName": "YouTubeShortsStudio",
+    "directories": {
+      "output": "dist-desktop"
+    },
+    "files": [
+      "bin/**/*",
+      "src/**/*",
+      "public/**/*",
+      "assets/**/*",
+      "theme.json",
+      "desktop/**/*",
+      "client/dist/**/*",
+      "node_modules/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": "portable",
+      "icon": "assets/logo.png"
+    }
   }
 }
