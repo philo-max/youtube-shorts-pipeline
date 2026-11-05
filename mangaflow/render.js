@@ -11,6 +11,7 @@ async function main() {
  const file = path.resolve(process.argv[2] || 'mangaflow/example.storyboard.json');
  const output = path.resolve(process.argv[3] || 'out/mangaflow.mp4');
  const workspace = fs.mkdtempSync(path.join(os.tmpdir(), 'mangaflow-'));
+ try {
  const board = validateStoryboard(JSON.parse(fs.readFileSync(file,'utf8')));
  const shots = board.shots.map(shot=>({
   ...shot, visual: {...shot.visual,
@@ -27,10 +28,13 @@ async function main() {
  const composition = await selectComposition({serveUrl,id:'MangaFlow',inputProps:props});
  await renderMedia({serveUrl,composition,inputProps:props,outputLocation:output,codec:'h264'});
  console.log('Exported:',output);
- fs.rmSync(workspace,{recursive:true,force:true});
+ } finally {
+  fs.rmSync(workspace,{recursive:true,force:true,maxRetries:3,retryDelay:200});
+ }
 }
 function stage(input,id,kind,workspace,baseDir) {
- const full = path.isAbsolute(input) ? path.resolve(input) : path.resolve(baseDir,input);
+ const candidates = path.isAbsolute(input) ? [path.resolve(input)] : [path.resolve(baseDir,input),path.resolve(process.cwd(),input)];
+ const full = candidates.find(candidate => fs.existsSync(candidate) && fs.statSync(candidate).isFile()) || candidates[0];
  if (!fs.existsSync(full) || !fs.statSync(full).isFile()) throw new Error('Missing '+kind+': '+full);
  const destDir = path.join(workspace,'mangaflow-assets');
  fs.mkdirSync(destDir,{recursive:true});
