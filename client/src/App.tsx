@@ -1,3 +1,4 @@
+import { MangaFlowPanel } from './MangaFlowPanel';
 import { useState, useEffect, useRef } from 'react';
 import { 
   Film, Settings, Tv, Plus, Trash2, Save, Play, CheckCircle2, 
@@ -29,6 +30,14 @@ declare global {
       getServerStatus: () => Promise<{ running: boolean; port: number }>;
       toggleServer: (start: boolean) => Promise<{ running: boolean; port: number }>;
       openDirectory: (path: string) => Promise<string>;
+      mangaFlow?: {
+        listProjects: () => Promise<string[]>;
+        loadProject: (id: string) => Promise<any>;
+        saveProject: (id: string, board: any) => Promise<unknown>;
+        renderProject: (id: string) => Promise<unknown>;
+        cancelRender: () => Promise<boolean>;
+        onRenderEvent: (callback: (event: {status:string;message?:string;output?:string}) => void) => () => void;
+      };
     };
   }
 }
@@ -55,7 +64,7 @@ const DEFAULT_THEME: ThemeConfig = {
 };
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<'editor' | 'theme' | 'render' | 'sync'>('editor');
+  const [activeTab, setActiveTab] = useState<'editor' | 'theme' | 'render' | 'sync' | 'mangaflow'>('editor');
   
   // Connection Mode State
   const [isElectron, setIsElectron] = useState<boolean>(false);
@@ -414,6 +423,7 @@ export default function App() {
 
   return (
     <div className="app-container">
+      {activeTab === 'mangaflow' && <MangaFlowPanel />}
       {/* Header */}
       <header className="header">
         <div className="logo-section">
@@ -445,6 +455,7 @@ export default function App() {
           )}
           
           <div className="tabs-navigation">
+            <button className={`tab-btn ${activeTab === 'mangaflow' ? 'active' : ''}`} onClick={() => setActiveTab('mangaflow')}><Film size={16}/> MangaFlow</button>
             <button 
               className={`tab-btn ${activeTab === 'editor' ? 'active' : ''}`}
               onClick={() => setActiveTab('editor')}
