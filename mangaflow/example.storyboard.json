@@ -1,0 +1,31 @@
+{
+  "version": 1,
+  "title": "雨夜车站",
+  "shots": [
+    {
+      "id": "shot_001",
+      "durationSeconds": 4,
+      "dialogue": {
+        "speakerId": "narrator",
+        "text": "雨落在空荡的站台。"
+      },
+      "visual": {
+        "mode": "motion_comic",
+        "imagePath": "test-data/images/1.jpg"
+      }
+    },
+    {
+      "id": "shot_002",
+      "durationSeconds": 5,
+      "dialogue": {
+        "speakerId": "heroine",
+        "text": "你终于来了。"
+      },
+      "visual": {
+        "mode": "image_to_video",
+        "imagePath": "test-data/images/2.jpg",
+        "videoPath": null
+      }
+    }
+  ]
+}
