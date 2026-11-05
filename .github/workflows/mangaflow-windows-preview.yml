@@ -1,8 +1,6 @@
 name: MangaFlow Windows preview
 on:
   workflow_dispatch:
-  push:
-    branches: [feat/mangaflow-v0.1]
 jobs:
   windows-preview:
     runs-on: windows-latest
