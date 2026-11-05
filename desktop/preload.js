@@ -15,5 +15,17 @@ contextBridge.exposeInMainWorld('electronAPI', {
   getIpAddress: () => ipcRenderer.invoke('get-ip-address'),
   getServerStatus: () => ipcRenderer.invoke('get-server-status'),
   toggleServer: (start) => ipcRenderer.invoke('toggle-server', start),
-  openDirectory: (path) => ipcRenderer.invoke('open-directory', path)
+  openDirectory: (path) => ipcRenderer.invoke('open-directory', path),
+  mangaFlow: {
+    listProjects: () => ipcRenderer.invoke('mangaflow:list-projects'),
+    loadProject: (id) => ipcRenderer.invoke('mangaflow:load-project', id),
+    saveProject: (id, board) => ipcRenderer.invoke('mangaflow:save-project', id, board),
+    renderProject: (id) => ipcRenderer.invoke('mangaflow:render-project', id),
+    cancelRender: () => ipcRenderer.invoke('mangaflow:cancel-render'),
+    onRenderEvent: (callback) => {
+      const listener = (_event, data) => callback(data);
+      ipcRenderer.on('mangaflow:render-event', listener);
+      return () => ipcRenderer.removeListener('mangaflow:render-event', listener);
+    }
+  }
 });
