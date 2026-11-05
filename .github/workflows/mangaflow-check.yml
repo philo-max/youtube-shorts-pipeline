@@ -1,0 +1,17 @@
+name: MangaFlow checks
+on:
+  push:
+    branches: [feat/mangaflow-v0.1]
+  pull_request:
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+      - run: npm ci
+      - run: node --test mangaflow/timeline.test.js
+      - run: npx tsc --noEmit --jsx react-jsx --esModuleInterop --moduleResolution node --target es2020 --skipLibCheck src/MangaFlow/types.ts src/MangaFlow/timeline.ts src/MangaFlow/MangaFlowComposition.tsx
