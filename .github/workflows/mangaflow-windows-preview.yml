@@ -1,0 +1,22 @@
+name: MangaFlow Windows preview
+on:
+  workflow_dispatch:
+  push:
+    branches: [feat/mangaflow-v0.1]
+jobs:
+  windows-preview:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: npm ci
+      - run: npm --prefix client ci
+      - run: npm --prefix client run build
+      - run: npx electron-builder --win portable --publish never
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MangaFlow-Windows-preview-unverified
+          path: dist-desktop/*.exe
+          if-no-files-found: error
