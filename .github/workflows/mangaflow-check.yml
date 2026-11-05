@@ -13,5 +13,7 @@ jobs:
           node-version: '20'
           cache: npm
       - run: npm ci
+      - run: npm --prefix client ci
+      - run: npm --prefix client run build
       - run: node --test mangaflow/timeline.test.js
       - run: npx tsc --noEmit --jsx react-jsx --esModuleInterop --moduleResolution node --target es2020 --skipLibCheck src/MangaFlow/types.ts src/MangaFlow/timeline.ts src/MangaFlow/MangaFlowComposition.tsx
