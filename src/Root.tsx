@@ -2,6 +2,9 @@ import React from 'react';
 import { Composition, getInputProps } from 'remotion';
 import { ShortsTemplate, InputProps } from './ShortsTemplate';
 import theme from '../theme.json';
+import { MangaFlowComposition } from './MangaFlow/MangaFlowComposition';
+import { timelineDuration } from './MangaFlow/timeline';
+import type { MangaProps } from './MangaFlow/types';
 
 const defaultProps: InputProps = {
   title: "真相库揭秘：全自动视频剪辑",
@@ -36,6 +39,15 @@ export const Root: React.FC = () => {
   
   return (
     <>
+      <Composition
+        id="MangaFlow"
+        component={MangaFlowComposition}
+        fps={fps}
+        width={1080}
+        height={1920}
+        durationInFrames={Math.max(1, timelineDuration(((inputProps as unknown as MangaProps).shots || []), fps, (inputProps as unknown as MangaProps).transitionFrames ?? 10))}
+        defaultProps={{title: 'MangaFlow Studio', shots: []} as MangaProps}
+      />
       <Composition
         id="ShortsTemplate"
         component={ShortsTemplate}
