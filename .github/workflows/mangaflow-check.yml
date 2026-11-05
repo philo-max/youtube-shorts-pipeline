@@ -1,8 +1,6 @@
 name: MangaFlow checks
 on:
-  push:
-    branches: [feat/mangaflow-v0.1]
-  pull_request:
+  workflow_dispatch:
 jobs:
   validate:
     runs-on: ubuntu-latest
