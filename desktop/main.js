@@ -5,6 +5,7 @@ const os = require('os');
 const { spawn } = require('child_process');
 const csv = require('csv-parser');
 const { createSyncServer } = require('./server');
+const { registerMangaFlowIpc } = require('./mangaflow-ipc');
 
 let mainWindow;
 let syncServer = null;
@@ -349,6 +350,7 @@ function registerIpcHandlers() {
 
 app.whenReady().then(() => {
   registerIpcHandlers();
+  registerMangaFlowIpc({onProgress: event => { if (mainWindow && !mainWindow.isDestroyed()) mainWindow.webContents.send('mangaflow:render-event', event); }});
   createWindow();
 
   app.on('activate', () => {
