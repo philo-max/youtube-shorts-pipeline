@@ -1,6 +1,7 @@
 'use strict';
 const fs = require('node:fs');
 const path = require('node:path');
+const os = require('node:os');
 const {bundle} = require('@remotion/bundler');
 const {selectComposition, renderMedia} = require('@remotion/renderer');
 const {validateStoryboard} = require('./schema');
@@ -9,27 +10,29 @@ const {buildTimeline} = require('./timeline');
 async function main() {
  const file = path.resolve(process.argv[2] || 'mangaflow/example.storyboard.json');
  const output = path.resolve(process.argv[3] || 'out/mangaflow.mp4');
+ const workspace = fs.mkdtempSync(path.join(os.tmpdir(), 'mangaflow-'));
  const board = validateStoryboard(JSON.parse(fs.readFileSync(file,'utf8')));
  const shots = board.shots.map(shot=>({
   ...shot, visual: {...shot.visual,
-   imagePath: shot.visual.imagePath ? stage(shot.visual.imagePath, shot.id, 'image', path.dirname(file)) : undefined,
-   videoPath: shot.visual.videoPath ? stage(shot.visual.videoPath, shot.id, 'video', path.dirname(file)) : undefined
+   imagePath: shot.visual.imagePath ? stage(shot.visual.imagePath, shot.id, 'image', workspace, path.dirname(file)) : undefined,
+   videoPath: shot.visual.videoPath ? stage(shot.visual.videoPath, shot.id, 'video', workspace, path.dirname(file)) : undefined
   },
-  audioPath: shot.audioPath ? stage(shot.audioPath, shot.id, 'audio', path.dirname(file)) : undefined
+  audioPath: shot.audioPath ? stage(shot.audioPath, shot.id, 'audio', workspace, path.dirname(file)) : undefined
  }));
  const props = {title:board.title || 'MangaFlow Studio',shots,transitionFrames:10};
  const timeline = buildTimeline({shots},30,10);
  console.log('Shots:',shots.length,'frames:',timeline.durationInFrames);
  fs.mkdirSync(path.dirname(output),{recursive:true});
- const serveUrl = await bundle(path.resolve('src/index.ts'));
+ const serveUrl = await bundle({entryPoint:path.resolve(__dirname,'..','src','index.ts'),publicDir:workspace});
  const composition = await selectComposition({serveUrl,id:'MangaFlow',inputProps:props});
  await renderMedia({serveUrl,composition,inputProps:props,outputLocation:output,codec:'h264'});
  console.log('Exported:',output);
+ fs.rmSync(workspace,{recursive:true,force:true});
 }
-function stage(input,id,kind,baseDir) {
- const full = path.isAbsolute(input) ? path.resolve(input) : path.resolve(process.cwd(),input);
+function stage(input,id,kind,workspace,baseDir) {
+ const full = path.isAbsolute(input) ? path.resolve(input) : path.resolve(baseDir,input);
  if (!fs.existsSync(full) || !fs.statSync(full).isFile()) throw new Error('Missing '+kind+': '+full);
- const destDir = path.resolve('public','mangaflow-assets');
+ const destDir = path.join(workspace,'mangaflow-assets');
  fs.mkdirSync(destDir,{recursive:true});
  const ext = path.extname(full).toLowerCase();
  const safeId = id.replace(/[^a-zA-Z0-9_-]/g,'_');
