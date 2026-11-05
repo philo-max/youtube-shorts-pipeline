@@ -12,10 +12,10 @@ async function main() {
  const board = validateStoryboard(JSON.parse(fs.readFileSync(file,'utf8')));
  const shots = board.shots.map(shot=>({
   ...shot, visual: {...shot.visual,
-   imagePath: shot.visual.imagePath ? stage(shot.visual.imagePath, shot.id, 'image') : undefined,
-   videoPath: shot.visual.videoPath ? stage(shot.visual.videoPath, shot.id, 'video') : undefined
+   imagePath: shot.visual.imagePath ? stage(shot.visual.imagePath, shot.id, 'image', path.dirname(file)) : undefined,
+   videoPath: shot.visual.videoPath ? stage(shot.visual.videoPath, shot.id, 'video', path.dirname(file)) : undefined
   },
-  audioPath: shot.audioPath ? stage(shot.audioPath, shot.id, 'audio') : undefined
+  audioPath: shot.audioPath ? stage(shot.audioPath, shot.id, 'audio', path.dirname(file)) : undefined
  }));
  const props = {title:board.title || 'MangaFlow Studio',shots,transitionFrames:10};
  const timeline = buildTimeline({shots},30,10);
@@ -26,8 +26,8 @@ async function main() {
  await renderMedia({serveUrl,composition,inputProps:props,outputLocation:output,codec:'h264'});
  console.log('Exported:',output);
 }
-function stage(input,id,kind) {
- const full = path.resolve(input);
+function stage(input,id,kind,baseDir) {
+ const full = path.isAbsolute(input) ? path.resolve(input) : path.resolve(process.cwd(),input);
  if (!fs.existsSync(full) || !fs.statSync(full).isFile()) throw new Error('Missing '+kind+': '+full);
  const destDir = path.resolve('public','mangaflow-assets');
  fs.mkdirSync(destDir,{recursive:true});
